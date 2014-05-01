@@ -103,4 +103,6 @@ var collectionWidget = (function( $, wp ){
 
 	};
 
+    return self;
+
 })( jQuery, wp );
