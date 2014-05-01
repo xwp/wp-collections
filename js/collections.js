@@ -1,6 +1,8 @@
-(function( $ ){
+/*global jQuery, alert */
+var collectionAddPostModal = (function( $ ){
+    "use strict";
 
-	collectionAddPostModal = {
+	var self = {
 
 		resultPosts: [],
 		selectedPosts: [],
@@ -43,7 +45,7 @@
 			// Live-ish search results
 			$( '#collections-add-post-search', this.wrap ).on( 'keydown.collections-add-post-search', $.proxy( function( e ) {
 				// Don't allow the input to be submitted
-				if ( e.keyCode == 13 ) {
+				if ( e.keyCode === 13 ) {
 					e.preventDefault();
 					return;
 				}
@@ -67,7 +69,7 @@
 					this.selectedPosts.push( post[0] );
 				}, this ) );
 
-				if ( typeof this.context.selectPosts == 'function' ) {
+				if ( typeof this.context.selectPosts === 'function' ) {
 					this.context.selectPosts( this.selectedPosts );
 				}
 
@@ -85,7 +87,7 @@
 			}, this ) );
 			$('body').on( 'keydown.collections-add-post-escape', $.proxy( function( e ) {
 
-				if ( e.keyCode == 27 ) {
+				if ( e.keyCode === 27 ) {
 					this.close();
 				}
 
@@ -130,33 +132,35 @@
 				nonce:    $( '#collections-add-post-search-nonce', this.wrap ).val()
 			};
 
-			$.get( ajaxurl, data, $.proxy( function( response ) {
+			$.get( wp.ajax.settings.url, data, $.proxy( function( response ) {
+                var resultTemplate, i, searchResults;
 
-				if ( response.status == 'success' ) {
+				if ( response.status === 'success' ) {
 
-					var searchResults = $('#collections-add-post-search-results', this.wrap );
+					searchResults = $('#collections-add-post-search-results', this.wrap );
 					searchResults.empty();
 					this.resultPosts = response.data.posts;
 					this.selectedPosts = [];
 
-					var resultTemplate = wp.template( 'collections-add-post-search-result' );
-					var i = 0;
+					resultTemplate = wp.template( 'collections-add-post-search-result' );
+					i = 0;
 					$.each( response.data.posts, $.proxy( function( index, post ) {
+                        var classes, data;
 
-						var classes = '';
+						classes = '';
 						if ( ! i || i % 2 === 0 ) {
 							classes += 'alternate';
 						}
 						i++;
 
-						var data = {
+						data = {
 							classes: classes,
 							post: post
 						};
 						searchResults.append( resultTemplate( data ) );
 					}, this ) );
 
-				} else if ( response.status == 'error' ) {
+				} else if ( response.status === 'error' ) {
 					alert( response.message );
 				}
 
@@ -165,5 +169,7 @@
 		}
 
 	};
+
+    return self;
 
 })( jQuery );

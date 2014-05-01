@@ -1,11 +1,14 @@
-(function( $, wp ){
+/*global wp, jQuery, collectionAddPostModal */
+var collectionWidget = (function( $, wp ){
+    'use strict';
+    var self;
 
 	$(document).on( 'widget-added', function( e, data ) {
 
-		collectionWidget.init( data );
+        self.init( data );
 	});
 
-	collectionWidget = {
+	self = {
 
 		/**
 		 * Initialize the collectionWidget interface
@@ -59,18 +62,19 @@
 		},
 
 		triggerDirtyWidget: function() {
+            var parent, control_id, settings;
 
-			if ( typeof wp.customize.Widgets == 'undefined' ) {
+			if ( typeof wp.customize.Widgets === 'undefined' ) {
 				return;
 			}
 
-			if ( typeof this.control == 'undefined' ) {
-				var parent = this.el.closest('li');
-				var control_id = parent.attr('id').replace(/customize-control-widget_/, '');
+			if ( typeof this.control === 'undefined' ) {
+				parent = this.el.closest('li');
+				control_id = parent.attr('id').replace(/customize-control-widget_/, '');
 				this.control = wp.customize.Widgets.getWidgetFormControlForWidget( control_id );
 			}
 
-			var settings = this.control.setting();
+			settings = this.control.setting();
 			settings.collection_items = [];
 		},
 
@@ -81,12 +85,13 @@
 
 			var template = wp.template( 'collection-item' );
 			$.each( posts, $.proxy( function( index, post ) {
-				var data = {
+                var collection_name, data;
+				data = {
 					post: post
 				};
 				this.el.find('.collection-items').prepend( template( data ) );
 
-				var collection_name = this.el.find('.collection-items').data('collection-item-field-name');
+				collection_name = this.el.find('.collection-items').data('collection-item-field-name');
 				this.el.find('.collection-item input').each( function( index, value ){
 					if ( ! $( value ).attr( 'name' ) ) {
 						$( value ).attr( 'name', collection_name );
